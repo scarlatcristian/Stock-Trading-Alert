@@ -47,3 +47,18 @@ if abs(stock_percentage_dif) > 5:
     res_news.raise_for_status()
     data_news = res_news.json()["articles"]
     first_articles = [data_news[:3]]
+
+    # Send message with stock price difference and articles title and description about company with https://twilio.com
+    account_sid = os.environ.get("TWILIO_SID")
+    auth_token = os.environ.get("TWILIO_TOKEN")
+    client = Client(account_sid, auth_token)
+
+    for article in first_articles:
+        message = client.messages.create(
+            body=f'{STOCK}: {emoji_up_down}{stock_percentage_dif}%\nHeadline: {article["title"]}\nBrief: {article["description"]}',
+
+            from_='+16032367267',
+            to=os.environ.get('PHONE_NUMBER')
+        )
+
+        print(message.sid, message.status)
